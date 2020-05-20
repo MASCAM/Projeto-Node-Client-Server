@@ -7,7 +7,7 @@ var router = express.Router();
 
 var client = restify.createJSONClient({ //cria meu client na porta 4000
 
-  url: 'http://localhost:4000/',
+  url: 'http://localhost:4000',
 
 });
 
@@ -21,7 +21,7 @@ router.get('/', function(req, res, next) {
     assert.ifError(err);
     res.end(JSON.stringify(obj, null, 2));
 
-  })
+  });
 
 });
 

@@ -203,14 +203,32 @@ class UserController {
 
     selectAll() { //para cada um dos usuários cadastrados na sessão, realiza o display na tela
 
-        let users = User.getUsersStorage();
-        users.forEach(dataUser => {
+        //let users = User.getUsersStorage(); //para usar diretório local
+        let ajax = new XMLHttpRequest(); //criando nova requisição XML
+        ajax.open('GET', '/users'); //chamando o método GET  no endereço /users
+        ajax.onload = event => { //evento a ser realizado quando o ajax carregar
 
-            let user = new User(); //pois o user retornado da getUsersStorage é um JSON, não um objeto em si
-            user.loadFromJSON(dataUser);
-            this.addLine(user);
+            let obj = { users: [] };
+            try {
 
-        });
+                obj = JSON.parse(ajax.responseText);
+
+            } catch (e) {
+
+                console.error(e);
+
+            }
+            
+            obj.users.forEach(dataUser => {
+
+                let user = new User(); //pois o user retornado do ajax é um JSON, não um objeto em si
+                user.loadFromJSON(dataUser);
+                this.addLine(user);
+    
+            });
+
+        };
+        ajax.send(); //para chamar a solicitação ajax
 
     } //fechando o selectAll()
 
