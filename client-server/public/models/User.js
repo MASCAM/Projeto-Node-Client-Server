@@ -91,7 +91,11 @@ class User {
                     this[name] = new Date(json[name]);
                     break;
                 default:
-                    this[name] = json[name];
+                    if (name.substring(0, 1) === '_') { //se o primeiro caractere do valor do campo for "_" passa pro objeto
+                        
+                        this[name] = json[name];
+
+                    }
     
             }
 
@@ -101,75 +105,58 @@ class User {
 
     static getUsersStorage() { //método q retorna todos os usuários ja cadastrados na sessão
 
-        let users = []; //para poder armazenar todas as chaves de usuários
-        if (localStorage.getItem("users")) {  //para armazenar no navegador
-            //se já haviam usuários cadastrados na sessão, importa eles para o array users
-            users = JSON.parse(localStorage.getItem("users"))
-
-        }
-        /*if (sessionStorage.getItem("users")) {
-            //se já haviam usuários cadastrados na sessão, importa eles para o array users
-            users = JSON.parse(sessionStorage.getItem("users"))
-
-        } */ //para armazenamento na sessão
-        return users;
+        return HttpRequest.get('/users');
 
     } //fechando o getUsersStorage()
 
-    getNewId() {
+    toJSON() { //método para converter o objeto para JSON
 
-        let usersID = parseInt(localStorage.getItem("usersID"));
-        if (!usersID > 0) {
-            
-            usersID = 0; //criando a variável id na janela
+        let json = {};
+        Object.keys(this).forEach(key => { //para passar cada atributo do objeto para o JSON criado
 
-        }
-        usersID++; //incrementando o id
-        localStorage.setItem("usersID", usersID);
-        return usersID; //retorna o id para ser armazenado no objeto usuário
+            if (this[key] !== undefined) {
+                
+                json[key] = this[key];
 
-    } //fechando o getNewId()
+            }
+
+        });
+        return json;
+
+    } //fechando método toJSON()
 
     save() {
 
-        let users = User.getUsersStorage();
-        if (this.id > 0) { //se o objeto ja possuir um id, procura ele dentro da array de usuários cadastrados
+        return new Promise((resolve, reject) => { //promessa para inserir os dados no db
 
-            users.map(u => {
+            let promise;
+            if (this.id) {
+    
+                promise = HttpRequest.put(`/users/${this.id}`, this.toJSON()); //chama o httrequest para put
+    
+            } else {
+    
+                promise = HttpRequest.post(`/users`, this.toJSON()); //chama o httrequest para post e armazena na promessa
+    
+            }
+            promise.then(data => { //para tratar os dados retornados da promessa e gravar no objeto
+    
+                this.loadFromJSON(data);
+                resolve(this);
+    
+            }).catch(e => { //caso tenha um erro
 
-                if (u._id == this.id) {
-
-                    Object.assign(u, this) //substitui o objeto na array pelo atual
-
-                }
-                return u;
+                reject(e);
 
             });
 
-        } else {
-
-            this._id = this.getNewId();
-            users.push(this); //coloca o objeto na array de users
-            //sessionStorage.setItem("users", JSON.stringify(users)); //grava dados na sessão
-
-        }
-        localStorage.setItem("users", JSON.stringify(users)); //armazena no navegador
+        });
     
     } //fechando o save()
 
     remove() {
 
-        let users = User.getUsersStorage();
-        users.forEach((userData, index) => {
-
-            if (this._id == userData._id) {
-
-                users.splice(index, 1); //remove um item a partir desse índice
-                
-            }
-
-        });
-        localStorage.setItem("users", JSON.stringify(users)); //armazena no navegador
+        return HttpRequest.delete(`/users/${this.id}`);
 
     } //fechando o remove
 

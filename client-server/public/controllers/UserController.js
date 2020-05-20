@@ -44,12 +44,15 @@ class UserController {
                     }
                     let user = new User();
                     user.loadFromJSON(result); //para poder passar os dados do usuário pra tr
-                    user.save();
-                    this.getTr(user, tr);
-                    this.updateCount();
-                    this.formUpdateEl.reset(); //para resetar o formulário de edição
-                    btn.disabled = false; //reseta o formulário e o botão submit
-                    this.showPanelCreate(); //para mostrar a tela do formulario de cadastro
+                    user.save().then(user => { //caso salvou no db
+
+                        this.getTr(user, tr);
+                        this.updateCount();
+                        this.formUpdateEl.reset(); //para resetar o formulário de edição
+                        btn.disabled = false; //reseta o formulário e o botão submit
+                        this.showPanelCreate(); //para mostrar a tela do formulario de cadastro
+
+                    });
 
                 }, 
 
@@ -84,10 +87,13 @@ class UserController {
                 (content) => {
 
                     values.photo = content;
-                    values.save();
-                    this.addLine(values);
-                    this.formEl.reset(); 
-                    btn.disabled = false; //reseta o formulário e o botão submit
+                    values.save().then(user => { //caso foi possível salvar no db
+
+                        this.addLine(user); //imprime na tela o usuário cadastrado ou modificado
+                        this.formEl.reset(); 
+                        btn.disabled = false; //reseta o formulário e o botão submit
+
+                    });
 
                 }, 
 
@@ -203,23 +209,10 @@ class UserController {
 
     selectAll() { //para cada um dos usuários cadastrados na sessão, realiza o display na tela
 
-        //let users = User.getUsersStorage(); //para usar diretório local
-        let ajax = new XMLHttpRequest(); //criando nova requisição XML
-        ajax.open('GET', '/users'); //chamando o método GET  no endereço /users
-        ajax.onload = event => { //evento a ser realizado quando o ajax carregar
+        
+        User.getUsersStorage().then(data => {
 
-            let obj = { users: [] };
-            try {
-
-                obj = JSON.parse(ajax.responseText);
-
-            } catch (e) {
-
-                console.error(e);
-
-            }
-            
-            obj.users.forEach(dataUser => {
+            data.users.forEach(dataUser => {
 
                 let user = new User(); //pois o user retornado do ajax é um JSON, não um objeto em si
                 user.loadFromJSON(dataUser);
@@ -227,8 +220,7 @@ class UserController {
     
             });
 
-        };
-        ajax.send(); //para chamar a solicitação ajax
+        });
 
     } //fechando o selectAll()
 
@@ -275,9 +267,12 @@ class UserController {
 
                 let user = new User();
                 user.loadFromJSON(JSON.parse(tr.dataset.user)); //pega o usuário na tabela transforma pra JSON e depois transforma para objeto e armazena em user
-                user.remove();
-                tr.remove();
-                this.updateCount();
+                user.remove().then(data => {
+
+                    tr.remove();
+                    this.updateCount();
+
+                });
 
             }
         
