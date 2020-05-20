@@ -39,6 +39,7 @@ module.exports = (app) => { //função q já recebe o app pelo consign
 
         check('_name').not().isEmpty().withMessage('O nome é obrigatório.'), //para impedir que esses dados estejam em branco
         check('_email').isEmail().withMessage('O e-mail está inválido.'),
+        check('_password').not().isEmpty().withMessage('É necessário criar uma senha.'),
 
     ], (req,res) => { //criando rota postar usuários no db
         
@@ -88,6 +89,7 @@ module.exports = (app) => { //função q já recebe o app pelo consign
 
         check('_name').not().isEmpty().withMessage('O nome é obrigatório.'), //para impedir que esses dados estejam em branco
         check('_email').isEmail().withMessage('O e-mail está inválido.'),
+        check('_password').not().isEmpty().withMessage('É necessário criar uma senha.'),
 
     ], (req,res) => { //rota com método para alterar os dados de um usuário específico
 

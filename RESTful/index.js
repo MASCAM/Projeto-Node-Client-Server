@@ -5,8 +5,8 @@ const bodyParser = require('body-parser'); //carregando todos os pacotes do pack
 
 
 let app = express(); //chamando o módulo express pro aplicativo
-app.use(bodyParser.urlencoded({extended: false})); //para poder carregar url codificada?
-app.use(bodyParser.json()); //carregando o método json do bodyParser pra aplicação
+app.use(bodyParser.urlencoded({extended: false, limit: '50mb'})); //para poder carregar url codificada?
+app.use(bodyParser.json({limit: '50mb'})); //carregando o método json do bodyParser pra aplicação
 
 
 consign().include('routes').include('utils').into(app); //incluir todos os arquivos de routes pro aplicativo
