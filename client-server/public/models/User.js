@@ -105,7 +105,7 @@ class User {
 
     static getUsersStorage() { //método q retorna todos os usuários ja cadastrados na sessão
 
-        return HttpRequest.get('/users');
+        return Fetch.get('/users');
 
     } //fechando o getUsersStorage()
 
@@ -132,11 +132,11 @@ class User {
             let promise;
             if (this.id) {
     
-                promise = HttpRequest.put(`/users/${this.id}`, this.toJSON()); //chama o httrequest para put
+                promise = Fetch.put(`/users/${this.id}`, this.toJSON()); //chama o httrequest para put
     
             } else {
     
-                promise = HttpRequest.post(`/users`, this.toJSON()); //chama o httrequest para post e armazena na promessa
+                promise = Fetch.post(`/users`, this.toJSON()); //chama o httrequest para post e armazena na promessa
     
             }
             promise.then(data => { //para tratar os dados retornados da promessa e gravar no objeto
@@ -156,7 +156,7 @@ class User {
 
     remove() {
 
-        return HttpRequest.delete(`/users/${this.id}`);
+        return Fetch.delete(`/users/${this.id}`);
 
     } //fechando o remove
 
